@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Daybook — Log in</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFF2E7;
+    --card:#F8FAF3;
+    --card-line:#DCE4CC;
+    --ink:#232E24;
+    --ink-soft:#66735F;
+    --ink-faint:#98A28F;
+    --rose:#CE7B92;
+    --rose-deep:#AD5D74;
+    --gold:#C79A3B;
+    --sage:#6C8F63;
+    --error:#B5504A;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 12% 8%, rgba(206,123,146,0.10), transparent 40%),
+      radial-gradient(circle at 88% 92%, rgba(108,143,99,0.12), transparent 45%);
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+  .card{
+    width:100%;
+    max-width:420px;
+    background:var(--card);
+    border:1px solid var(--card-line);
+    border-radius:20px;
+    box-shadow:0 24px 60px -30px rgba(35,46,36,0.35);
+    overflow:hidden;
+  }
+  .card-inner{padding:36px 36px 32px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--rose-deep);
+    margin:0 0 10px;
+  }
+  h1{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-weight:400;
+    font-size:34px;
+    line-height:1.15;
+    margin:0 0 6px;
+    color:var(--ink);
+  }
+  .sub{
+    margin:0 0 26px;
+    font-size:14px;
+    color:var(--ink-soft);
+    line-height:1.5;
+  }
+
+  form{display:flex; flex-direction:column; gap:16px;}
+  .field label{
+    display:block;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .field input{
+    width:100%;
+    background:var(--paper);
+    border:1.5px solid var(--card-line);
+    border-radius:11px;
+    outline:none;
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    font-size:15px;
+    padding:12px 14px;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .field input::placeholder{color:var(--ink-faint);}
+  .field input:focus{border-color:var(--rose); background:var(--card);}
+
+  button.submit{
+    background:var(--ink);
+    border:none;
+    color:var(--paper);
+    font-family:'Work Sans',sans-serif;
+    font-weight:600;
+    font-size:14.5px;
+    padding:14px 20px;
+    border-radius:11px;
+    cursor:pointer;
+    transition:transform .12s ease, background .15s ease;
+    margin-top:4px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+  }
+  button.submit:hover{background:var(--rose-deep);}
+  button.submit:active{transform:scale(0.98);}
+  button.submit:disabled{opacity:0.6; cursor:default; transform:none;}
+
+  .spinner{
+    width:13px; height:13px;
+    border:2px solid rgba(239,242,231,0.4);
+    border-top-color:var(--paper);
+    border-radius:50%;
+    display:none;
+    animation:spin .7s linear infinite;
+  }
+  button.submit.loading .spinner{display:inline-block;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .banner{
+    font-family:'Work Sans',sans-serif;
+    font-size:13px;
+    padding:11px 13px;
+    border-radius:10px;
+    display:none;
+    line-height:1.4;
+  }
+  .banner.error{
+    display:block;
+    color:var(--error);
+    border:1px solid rgba(181,80,74,0.3);
+    background:rgba(181,80,74,0.08);
+  }
+  .banner.success{
+    display:block;
+    color:var(--sage);
+    border:1px solid rgba(108,143,99,0.3);
+    background:rgba(108,143,99,0.09);
+  }
+
+  .switch{
+    text-align:center;
+    font-size:13.5px;
+    color:var(--ink-soft);
+    padding:22px 36px 28px;
+    border-top:1px solid var(--card-line);
+  }
+  .switch a{color:var(--rose-deep); text-decoration:none; font-weight:600;}
+  .switch a:hover{text-decoration:underline;}
+
+  details.advanced{margin-top:2px;}
+  details.advanced summary{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    cursor:pointer;
+    list-style:none;
+    user-select:none;
+  }
+  details.advanced summary::-webkit-details-marker{display:none;}
+  details.advanced .api-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:10px;
+  }
+  details.advanced input{
+    flex:1;
+    background:var(--paper);
+    border:1px solid var(--card-line);
+    border-radius:8px;
+    color:var(--ink);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    padding:7px 9px;
+    outline:none;
+  }
+
+  input:focus-visible, button:focus-visible{
+    outline:2px solid var(--rose);
+    outline-offset:2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="card-inner">
+    <p class="eyebrow">Daybook</p>
+    <h1>Welcome back.</h1>
+    <p class="sub">Pick up where your last page left off.</p>
+
+    <form id="loginForm">
+      <div id="banner" class="banner"></div>
+
+      <div class="field">
+        <label for="username">Username</label>
+        <input id="username" type="text" placeholder="e.g. omeiza" autocomplete="username" required />
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
+      </div>
+
+      <button type="submit" class="submit" id="submitBtn">
+        <span class="spinner"></span>
+        <span id="submitLabel">Log in</span>
+      </button>
+
+      <details class="advanced">
+        <summary></summary>
+        <div class="api-row">
+          <input id="apiBase" type="text" value="http://127.0.0.1:8000" spellcheck="false" />
+        </div>
+      </details>
+    </form>
+  </div>
+
+  <div class="switch">New here? <a href="Register.html">Create an account</a></div>
+</div>
+
+<script>
+(function(){
+  const form = document.getElementById('loginForm');
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
+  const submitBtn = document.getElementById('submitBtn');
+  const submitLabel = document.getElementById('submitLabel');
+  const banner = document.getElementById('banner');
+  const apiBaseInput = document.getElementById('apiBase');
+
+  // A full name like "Musa Jamiu Omeiza" greets as just "Omeiza" — the last
+  // word — rather than the whole name. A single-word name passes through as-is.
+  function toDisplayName(fullName){
+    if(!fullName) return null;
+    const parts = fullName.trim().split(/\s+/).filter(Boolean);
+    return parts.length ? parts[parts.length - 1] : null;
+  }
+
+  function apiBase(){
+    return apiBaseInput.value.trim().replace(/\/$/, '');
+  }
+  function showBanner(kind, msg){
+    banner.className = 'banner ' + kind;
+    banner.textContent = msg;
+  }
+  function clearBanner(){
+    banner.className = 'banner';
+    banner.textContent = '';
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearBanner();
+
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
+
+    submitBtn.disabled = true;
+    submitBtn.classList.add('loading');
+    submitLabel.textContent = 'Logging in…';
+
+    try{
+      const formBody = new URLSearchParams();
+      formBody.set('username', username);
+      formBody.set('password', password);
+
+      const res = await fetch(apiBase() + '/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: formBody
+      });
+
+      if(!res.ok){
+        let detail = res.statusText;
+        try{ const j = await res.json(); if(j.detail) detail = j.detail; }catch(err){}
+        throw new Error(detail);
+      }
+
+      const data = await res.json();
+      const token = data.access_token;
+      if(!token){
+        throw new Error('No access_token in response — check the field name your API returns.');
+      }
+
+      showBanner('success', 'Signed in. Opening your page…');
+      // Token and display name are kept in sessionStorage — never in the URL, history, or on disk.
+      sessionStorage.setItem('daybook_token', token);
+      if(data.full_name){
+        sessionStorage.setItem('daybook_fullname', toDisplayName(data.full_name));
+      }
+      setTimeout(() => {
+        window.location.href = 'TodoApp.html';
+      }, 500);
+    }catch(err){
+      showBanner('error', `Couldn't log in — ${err.message}`);
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('loading');
+      submitLabel.textContent = 'Log in';
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

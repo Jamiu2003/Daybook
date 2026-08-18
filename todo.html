@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Omeiza Todo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#141820;
+    --surface:#1b212b;
+    --surface-raised:#212836;
+    --line:#2a3140;
+    --ink:#ece7da;
+    --ink-dim:#8a92a3;
+    --amber:#e3a944;
+    --amber-dim:#8a6a30;
+    --rust:#c76a4f;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:56px 20px;
+  }
+  .sheet{
+    width:100%;
+    max-width:600px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  header{
+    padding:24px 28px 16px;
+    border-bottom:1px solid var(--line);
+  }
+  .head-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-bottom:14px;
+  }
+  header h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:24px;
+    letter-spacing:0.02em;
+    margin:0;
+    color:var(--ink);
+  }
+  header h1 span{color:var(--amber);}
+  .meta{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-dim);
+    text-align:right;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+  }
+  .api-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-dim);
+  }
+  .api-row label{flex-shrink:0; letter-spacing:0.04em; text-transform:uppercase;}
+  .api-row input{
+    flex:1;
+    background:var(--surface-raised);
+    border:1px solid var(--line);
+    border-radius:3px;
+    color:var(--ink);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    padding:6px 8px;
+    outline:none;
+  }
+  .api-row input:focus{border-color:var(--amber-dim);}
+  .status-dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--ink-dim);
+    flex-shrink:0;
+    transition:background .2s ease;
+  }
+  .status-dot.ok{background:#7fb37a;}
+  .status-dot.bad{background:var(--rust);}
+
+  .add-panel{
+    padding:16px 24px;
+    border-bottom:1px solid var(--line);
+    background:var(--surface-raised);
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .add-panel .field-row{display:flex; gap:8px;}
+  .add-panel input, .add-panel textarea{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:3px;
+    outline:none;
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    padding:10px 12px;
+    resize:none;
+  }
+  .add-panel input#titleInput{flex:1;}
+  .add-panel input::placeholder, .add-panel textarea::placeholder{color:var(--ink-dim);}
+  .add-panel textarea{min-height:40px;}
+  .add-panel button{
+    background:none;
+    border:1px solid var(--amber-dim);
+    color:var(--amber);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    padding:10px 20px;
+    border-radius:3px;
+    cursor:pointer;
+    transition:background .15s ease;
+    align-self:flex-start;
+  }
+  .add-panel button:hover{background:rgba(227,169,68,0.08);}
+  .add-panel button:disabled{opacity:0.4; cursor:default;}
+
+  ul.entries{
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+  li.entry{
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+    padding:14px 24px;
+    border-bottom:1px solid var(--line);
+    position:relative;
+  }
+  li.entry:last-child{border-bottom:none;}
+  .num{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--ink-dim);
+    width:22px;
+    flex-shrink:0;
+    padding-top:2px;
+  }
+  .box{
+    width:17px;height:17px;
+    border:1.5px solid var(--ink-dim);
+    border-radius:3px;
+    flex-shrink:0;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:border-color .15s ease;
+    margin-top:1px;
+  }
+  .box:hover{border-color:var(--amber);}
+  .box svg{width:11px;height:11px;opacity:0;transition:opacity .1s ease;}
+  li.done .box{border-color:var(--amber); background:rgba(227,169,68,0.12);}
+  li.done .box svg{opacity:1;}
+
+  .body{flex:1; min-width:0;}
+  .title-txt{
+    font-size:15px;
+    color:var(--ink);
+    word-break:break-word;
+  }
+  .desc-txt{
+    font-size:12.5px;
+    color:var(--ink-dim);
+    margin-top:3px;
+    word-break:break-word;
+  }
+  li.done .title-txt{color:var(--ink-dim); text-decoration:line-through; text-decoration-color:var(--amber-dim);}
+
+  .time{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-dim);
+    flex-shrink:0;
+    white-space:nowrap;
+    padding-top:2px;
+  }
+
+  .del{
+    background:none;border:none;
+    color:var(--ink-dim);
+    font-size:15px;
+    cursor:pointer;
+    padding:4px 2px;
+    flex-shrink:0;
+    opacity:0;
+    transition:opacity .12s ease, color .12s ease;
+  }
+  li.entry:hover .del{opacity:1;}
+  .del:hover{color:var(--rust);}
+
+  .stamp{
+    position:absolute;
+    right:44px;
+    top:14px;
+    transform:rotate(-9deg) scale(0.6);
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:11px;
+    letter-spacing:0.12em;
+    color:var(--amber);
+    border:1.5px solid var(--amber);
+    border-radius:3px;
+    padding:2px 6px;
+    opacity:0;
+    pointer-events:none;
+  }
+  li.stamp-anim .stamp{
+    animation:stamp-in .38s cubic-bezier(.2,1.4,.4,1) forwards;
+  }
+  @keyframes stamp-in{
+    0%{opacity:0; transform:rotate(-9deg) scale(2.2);}
+    60%{opacity:1; transform:rotate(-9deg) scale(0.85);}
+    100%{opacity:1; transform:rotate(-9deg) scale(1);}
+  }
+
+  .empty, .loading, .error-banner{
+    padding:36px 24px 40px;
+    text-align:center;
+    color:var(--ink-dim);
+    font-size:14px;
+  }
+  .empty .glyph2, .loading .glyph2{
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--amber-dim);
+    font-size:12px;
+    display:block;
+    margin-bottom:6px;
+    letter-spacing:0.06em;
+  }
+  .error-banner{
+    color:var(--rust);
+    border-bottom:1px solid var(--line);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    text-align:left;
+    padding:12px 24px;
+  }
+
+  footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 24px;
+    background:var(--surface-raised);
+  }
+  .filters{
+    display:flex;
+    gap:2px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+  .filters button{
+    background:none;
+    border:1px solid transparent;
+    color:var(--ink-dim);
+    padding:5px 10px;
+    border-radius:3px;
+    cursor:pointer;
+  }
+  .filters button.active{
+    color:var(--amber);
+    border-color:var(--amber-dim);
+    background:rgba(227,169,68,0.08);
+  }
+  .count{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-dim);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    li.stamp-anim .stamp{animation:none; opacity:1; transform:rotate(-9deg) scale(1);}
+  }
+
+  input:focus-visible, button:focus-visible, .box:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--amber);
+    outline-offset:2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+  <header>
+    <div class="head-row">
+      <h1>Omeiza<span>.</span></h1>
+      <div class="meta" id="dateMeta"></div>
+    </div>
+    <div class="api-row">
+      <span class="status-dot" id="statusDot"></span>
+      <label for="apiBase">API</label>
+      <input id="apiBase" type="text" value="http://127.0.0.1:8000" spellcheck="false" />
+    </div>
+  </header>
+
+  <div id="errorBanner" class="error-banner" style="display:none;"></div>
+
+  <div class="add-panel">
+    <div class="field-row">
+      <input id="titleInput" type="text" placeholder="Task title" maxlength="140" />
+    </div>
+    <textarea id="descInput" placeholder="Description (optional)" maxlength="500"></textarea>
+    <button id="addBtn">Add entry</button>
+  </div>
+
+  <ul class="entries" id="entries"></ul>
+  <div class="loading" id="loadingState">
+    <span class="glyph2">— loading —</span>
+    Fetching todos from the API.
+  </div>
+  <div class="empty" id="emptyState" style="display:none;">
+    <span class="glyph2">— nothing logged —</span>
+    Add your first task above.
+  </div>
+
+  <footer>
+    <div class="filters" id="filters">
+      <button data-filter="all" class="active">All</button>
+      <button data-filter="active">Active</button>
+      <button data-filter="done">Done</button>
+    </div>
+    <div class="count" id="count">—</div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  let tasks = [];
+  let filter = 'all';
+
+  const entriesEl = document.getElementById('entries');
+  const emptyEl = document.getElementById('emptyState');
+  const loadingEl = document.getElementById('loadingState');
+  const errorEl = document.getElementById('errorBanner');
+  const countEl = document.getElementById('count');
+  const titleInput = document.getElementById('titleInput');
+  const descInput = document.getElementById('descInput');
+  const addBtn = document.getElementById('addBtn');
+  const filtersEl = document.getElementById('filters');
+  const dateMeta = document.getElementById('dateMeta');
+  const apiBaseInput = document.getElementById('apiBase');
+  const statusDot = document.getElementById('statusDot');
+
+  dateMeta.textContent = new Date().toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'});
+
+  function apiBase(){
+    return apiBaseInput.value.trim().replace(/\/$/, '');
+  }
+
+  function showError(msg){
+    errorEl.textContent = msg;
+    errorEl.style.display = 'block';
+    statusDot.className = 'status-dot bad';
+  }
+  function clearError(){
+    errorEl.style.display = 'none';
+  }
+  function markOk(){
+    statusDot.className = 'status-dot ok';
+  }
+
+  async function api(path, opts){
+    const res = await fetch(apiBase() + path, {
+      headers: {'Content-Type': 'application/json'},
+      ...opts
+    });
+    if(!res.ok){
+      let detail = res.statusText;
+      try{ const j = await res.json(); if(j.detail) detail = j.detail; }catch(e){}
+      throw new Error(`${res.status} ${detail}`);
+    }
+    if(res.status === 204) return null;
+    return res.json();
+  }
+
+  async function loadTasks(){
+    loadingEl.style.display = 'block';
+    emptyEl.style.display = 'none';
+    clearError();
+    try{
+      const data = await api('/', { method: 'GET' });
+      tasks = Array.isArray(data) ? data : [];
+      markOk();
+    }catch(err){
+      tasks = [];
+      showError(`Couldn't reach GET / on the API — ${err.message}. If your backend doesn't have a list route at "/", add one, or tell me the correct path.`);
+    }
+    loadingEl.style.display = 'none';
+    render();
+  }
+
+  async function addTask(){
+    const title = titleInput.value.trim();
+    if(!title) return;
+    const description = descInput.value.trim();
+    addBtn.disabled = true;
+    try{
+      const created = await api('/', {
+        method: 'POST',
+        body: JSON.stringify({ title, description: description || null })
+      });
+      tasks.push(created);
+      titleInput.value = '';
+      descInput.value = '';
+      clearError();
+      markOk();
+    }catch(err){
+      showError(`Add failed — ${err.message}`);
+    }
+    addBtn.disabled = false;
+    render();
+  }
+
+  async function toggleTask(id){
+    const t = tasks.find(t => t.id === id);
+    if(!t) return;
+    const newCompleted = !t.completed;
+    try{
+      const updated = await api(`/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ completed: newCompleted })
+      });
+      Object.assign(t, updated);
+      clearError();
+      markOk();
+      render(newCompleted ? id : null);
+    }catch(err){
+      showError(`Update failed — ${err.message}`);
+    }
+  }
+
+  async function deleteTask(id){
+    try{
+      await api(`/${id}`, { method: 'DELETE' });
+      tasks = tasks.filter(t => t.id !== id);
+      clearError();
+      markOk();
+      render();
+    }catch(err){
+      showError(`Delete failed — ${err.message}`);
+    }
+  }
+
+  function checkSvg(){
+    return '<svg viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 5.5L4 8L9.5 2.5" stroke="#e3a944" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+
+  function render(justCompletedId){
+    const visible = tasks.filter(t=>{
+      if(filter === 'active') return !t.completed;
+      if(filter === 'done') return t.completed;
+      return true;
+    });
+
+    entriesEl.innerHTML = '';
+    emptyEl.style.display = (tasks.length === 0 && loadingEl.style.display !== 'block') ? 'block' : 'none';
+
+    visible.forEach((t, i) => {
+      const li = document.createElement('li');
+      li.className = 'entry' + (t.completed ? ' done' : '') + (t.id === justCompletedId ? ' stamp-anim' : '');
+      li.innerHTML = `
+        <span class="num">${String(i+1).padStart(2,'0')}</span>
+        <span class="box" role="checkbox" aria-checked="${t.completed}" tabindex="0">${checkSvg()}</span>
+        <span class="body">
+          <span class="title-txt">${escapeHtml(t.title || '')}</span>
+          ${t.description ? `<div class="desc-txt">${escapeHtml(t.description)}</div>` : ''}
+        </span>
+        ${t.completed ? '<span class="stamp">DONE</span>' : ''}
+        <span class="time">${formatTime(t.time_created)}</span>
+        <button class="del" aria-label="Delete entry">✕</button>
+      `;
+      const box = li.querySelector('.box');
+      box.addEventListener('click', () => toggleTask(t.id));
+      box.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleTask(t.id);} });
+      li.querySelector('.del').addEventListener('click', () => deleteTask(t.id));
+      entriesEl.appendChild(li);
+    });
+
+    const activeCount = tasks.filter(t=>!t.completed).length;
+    countEl.textContent = tasks.length === 0
+      ? '0 entries'
+      : `${activeCount} active · ${tasks.length} total`;
+  }
+
+  function formatTime(iso){
+    if(!iso) return '';
+    const d = new Date(iso);
+    if(isNaN(d.getTime())) return '';
+    const now = new Date();
+    const sameDay = d.toDateString() === now.toDateString();
+    return sameDay
+      ? d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})
+      : d.toLocaleDateString('en-US',{month:'short',day:'2-digit'});
+  }
+
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  addBtn.addEventListener('click', addTask);
+  titleInput.addEventListener('keydown', e => { if(e.key === 'Enter') addTask(); });
+
+  filtersEl.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-filter]');
+    if(!btn) return;
+    filter = btn.dataset.filter;
+    [...filtersEl.children].forEach(b => b.classList.toggle('active', b === btn));
+    render();
+  });
+
+  apiBaseInput.addEventListener('change', loadTasks);
+
+  loadTasks();
+})();
+</script>
+
+</body>
+</html>

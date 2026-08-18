@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Daybook</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFF2E7;
+    --card:#F8FAF3;
+    --card-line:#DCE4CC;
+    --ink:#232E24;
+    --ink-soft:#66735F;
+    --ink-faint:#98A28F;
+    --rose:#CE7B92;
+    --rose-deep:#AD5D74;
+    --gold:#C79A3B;
+    --sage:#6C8F63;
+    --error:#B5504A;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 10% 0%, rgba(206,123,146,0.09), transparent 38%),
+      radial-gradient(circle at 92% 100%, rgba(108,143,99,0.11), transparent 42%);
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    min-height:100vh;
+    padding:40px 20px 80px;
+  }
+  .wrap{max-width:640px; margin:0 auto;}
+
+  /* ---------- Header ---------- */
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:22px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--rose-deep);
+    margin:0 0 6px;
+  }
+  h1.greeting{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-weight:400;
+    font-size:36px;
+    line-height:1.1;
+    margin:0;
+    color:var(--ink);
+  }
+  h1.greeting .user{color:var(--rose-deep);}
+  .date-line{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:6px;
+  }
+  .streak{
+    text-align:right;
+    flex-shrink:0;
+    padding-left:16px;
+  }
+  .streak .num{
+    font-family:'Instrument Serif',serif;
+    font-size:30px;
+    color:var(--gold);
+    line-height:1;
+  }
+  .streak .label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    margin-top:2px;
+  }
+  .logout-btn{
+    display:block;
+    margin:10px 0 0 auto;
+    background:none;
+    border:1px solid var(--card-line);
+    color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:5px 10px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .logout-btn:hover{
+    border-color:var(--rose-deep);
+    color:var(--rose-deep);
+  }
+
+  nav.nav-row{
+    display:flex;
+    gap:22px;
+    margin:20px 0 22px;
+    border-bottom:1px solid var(--card-line);
+  }
+  nav.nav-row a{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:0 0 10px;
+    border-bottom:2px solid transparent;
+    transition:color .15s ease, border-color .15s ease;
+  }
+  nav.nav-row a:hover{color:var(--rose-deep);}
+  nav.nav-row a.active{
+    color:var(--ink);
+    font-weight:600;
+    border-bottom-color:var(--rose-deep);
+  }
+
+  .error-banner{
+    font-size:13px;
+    color:var(--error);
+    background:rgba(181,80,74,0.08);
+    border:1px solid rgba(181,80,74,0.25);
+    border-radius:10px;
+    padding:11px 14px;
+    margin-bottom:18px;
+    display:none;
+    line-height:1.45;
+  }
+
+  /* ---------- Cards ---------- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--card-line);
+    border-radius:20px;
+    box-shadow:0 20px 50px -32px rgba(35,46,36,0.4);
+    padding:24px;
+    margin-bottom:20px;
+  }
+  .card h2{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-weight:400;
+    font-size:20px;
+    margin:0 0 4px;
+    color:var(--ink);
+  }
+  .card .card-sub{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin:0 0 16px;
+  }
+
+  /* ---------- Mood ring ---------- */
+  .mood-row{
+    display:flex;
+    gap:10px;
+    margin-bottom:4px;
+  }
+  .mood-btn{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    background:none;
+    border:1.5px solid var(--card-line);
+    border-radius:14px;
+    padding:11px 4px 9px;
+    cursor:pointer;
+    transition:transform .12s ease, border-color .15s ease, background .15s ease;
+  }
+  .mood-btn .glyph{
+    width:22px; height:22px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px;
+  }
+  .mood-btn .label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+  }
+  .mood-btn:hover{border-color:var(--ink-faint);}
+  .mood-btn.selected{
+    border-color:var(--mood-color, var(--rose));
+    background:color-mix(in srgb, var(--mood-color, var(--rose)) 12%, transparent);
+    transform:translateY(-2px);
+  }
+  .mood-btn.selected .label{color:var(--mood-color, var(--rose));}
+
+  /* ---------- Diary composer ---------- */
+  textarea#diaryContent{
+    width:100%;
+    min-height:110px;
+    background:var(--paper);
+    border:1.5px solid var(--card-line);
+    border-radius:13px;
+    outline:none;
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    font-size:14.5px;
+    line-height:1.55;
+    padding:13px 14px;
+    resize:vertical;
+    margin-top:14px;
+  }
+  textarea#diaryContent::placeholder{color:var(--ink-faint);}
+  textarea#diaryContent:focus{border-color:var(--rose);}
+
+  .composer-foot{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:12px;
+  }
+  .char-hint{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    color:var(--ink-faint);
+  }
+  button.primary{
+    background:var(--ink);
+    border:none;
+    color:var(--paper);
+    font-family:'Work Sans',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    padding:11px 20px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:background .15s ease, transform .1s ease;
+  }
+  button.primary:hover{background:var(--rose-deep);}
+  button.primary:active{transform:scale(0.97);}
+  button.primary:disabled{opacity:0.45; cursor:default; transform:none;}
+
+  /* ---------- Tasks ---------- */
+  .add-task-row{
+    display:flex;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .add-task-row input{
+    flex:1;
+    background:var(--paper);
+    border:1.5px solid var(--card-line);
+    border-radius:11px;
+    outline:none;
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    font-size:14px;
+    padding:10px 13px;
+  }
+  .add-task-row input::placeholder{color:var(--ink-faint);}
+  .add-task-row input:focus{border-color:var(--rose);}
+  .add-task-row button{
+    background:var(--ink);
+    border:none;
+    color:var(--paper);
+    width:42px;
+    border-radius:11px;
+    cursor:pointer;
+    font-size:18px;
+    line-height:1;
+    flex-shrink:0;
+    transition:background .15s ease;
+  }
+  .add-task-row button:hover{background:var(--rose-deep);}
+
+  ul.tasks{list-style:none; margin:0; padding:0;}
+  li.task{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 2px;
+    border-bottom:1px solid var(--card-line);
+  }
+  li.task:last-child{border-bottom:none;}
+  .box{
+    width:19px;height:19px;
+    border:1.5px solid var(--ink-faint);
+    border-radius:7px;
+    flex-shrink:0;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .box:hover{border-color:var(--sage);}
+  .box svg{width:11px; height:11px; opacity:0; transition:opacity .1s ease;}
+  li.task.done .box{border-color:var(--sage); background:var(--sage);}
+  li.task.done .box svg{opacity:1;}
+  .task-title{flex:1; font-size:14.5px; word-break:break-word;}
+  li.task.done .task-title{color:var(--ink-faint); text-decoration:line-through;}
+  .task-del{
+    background:none; border:none; color:var(--ink-faint);
+    font-size:14px; cursor:pointer; padding:4px; opacity:0;
+    transition:opacity .12s ease, color .12s ease;
+  }
+  li.task:hover .task-del{opacity:1;}
+  .task-del:hover{color:var(--error);}
+  .tasks-empty{
+    font-size:13px; color:var(--ink-faint); text-align:center; padding:18px 0 6px;
+  }
+
+  /* ---------- Past pages ---------- */
+  .page-entry{
+    padding:14px 0;
+    border-bottom:1px solid var(--card-line);
+    cursor:pointer;
+  }
+  .page-entry:last-child{border-bottom:none;}
+  .page-entry-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .page-mood-dot{
+    width:9px;height:9px;border-radius:50%;flex-shrink:0;
+  }
+  .page-date{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    flex-shrink:0;
+  }
+  .page-preview{
+    font-size:13.5px;
+    color:var(--ink);
+    flex:1;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .page-full{
+    display:none;
+    margin-top:8px;
+    padding-left:19px;
+    font-size:14px;
+    line-height:1.6;
+    color:var(--ink);
+    white-space:pre-wrap;
+  }
+  .page-entry.expanded .page-full{display:block;}
+  .page-entry.expanded .page-preview{white-space:normal;}
+
+  .empty-note{
+    font-size:13px; color:var(--ink-faint); text-align:center; padding:10px 0 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .mood-btn, button.primary, .add-task-row button{transition:none;}
+  }
+  input:focus-visible, button:focus-visible, textarea:focus-visible, .box:focus-visible{
+    outline:2px solid var(--rose);
+    outline-offset:2px;
+  }
+  @media (max-width:480px){
+    .mood-btn .label{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="topbar">
+    <div>
+      <p class="eyebrow">Daybook</p>
+      <h1 class="greeting" id="greeting">Hi<span class="user" id="usernameSpan"></span></h1>
+      <div class="date-line" id="dateLine"></div>
+    </div>
+    <div class="streak">
+      <div class="num" id="streakNum">0</div>
+      <div class="label">day streak</div>
+      <button type="button" id="logoutBtn" class="logout-btn">Log out</button>
+    </div>
+  </div>
+
+  <nav class="nav-row">
+    <a href="TodoApp.html" class="active">Today</a>
+    <a href="Goals.html">Goals</a>
+  </nav>
+
+  <div id="errorBanner" class="error-banner"></div>
+
+  <!-- Mood + diary -->
+  <div class="card">
+    <h2>Today's page</h2>
+    <p class="card-sub">How today went, in your own words.</p>
+
+    <div class="mood-row" id="moodRow"></div>
+
+    <textarea id="diaryContent" placeholder="What happened today?" maxlength="4000"></textarea>
+    <div class="composer-foot">
+      <span class="char-hint" id="charHint">0 / 4000</span>
+      <button class="primary" id="saveEntryBtn">Save entry</button>
+    </div>
+  </div>
+
+  <!-- Tasks -->
+  <div class="card">
+    <h2>Tasks</h2>
+    <p class="card-sub" id="tasksSub">Keep today moving.</p>
+
+    <div class="add-task-row">
+      <input id="taskInput" type="text" placeholder="Add a task" maxlength="140" />
+      <button id="addTaskBtn" aria-label="Add task">+</button>
+    </div>
+
+    <ul class="tasks" id="taskList"></ul>
+    <div class="tasks-empty" id="tasksEmpty" style="display:none;">Nothing on the list yet.</div>
+  </div>
+
+  <!-- Past pages -->
+  <div class="card">
+    <h2>Past pages</h2>
+    <p class="card-sub">Entries you've written before.</p>
+    <div id="pastPages"></div>
+    <div class="empty-note" id="pastEmpty" style="display:none;">Your first entry will show up here.</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const MOODS = [
+    { id: 'great', emoji: '☀', label: 'Great', color: '#C79A3B' },
+    { id: 'good',  emoji: '🙂', label: 'Good',  color: '#6C8F63' },
+    { id: 'okay',  emoji: '〜', label: 'Okay',  color: '#98A28F' },
+    { id: 'low',   emoji: '🌧', label: 'Low',   color: '#CE7B92' },
+    { id: 'hard',  emoji: '⚡', label: 'Hard',  color: '#AD5D74' },
+  ];
+
+  let selectedMood = null;
+  let tasks = [];
+  let entries = [];
+
+  const greeting = document.getElementById('greeting');
+  const usernameSpan = document.getElementById('usernameSpan');
+  const dateLine = document.getElementById('dateLine');
+  const streakNum = document.getElementById('streakNum');
+  const moodRow = document.getElementById('moodRow');
+  const diaryContent = document.getElementById('diaryContent');
+  const charHint = document.getElementById('charHint');
+  const saveEntryBtn = document.getElementById('saveEntryBtn');
+  const taskInput = document.getElementById('taskInput');
+  const addTaskBtn = document.getElementById('addTaskBtn');
+  const taskList = document.getElementById('taskList');
+  const tasksEmpty = document.getElementById('tasksEmpty');
+  const tasksSub = document.getElementById('tasksSub');
+  const pastPages = document.getElementById('pastPages');
+  const pastEmpty = document.getElementById('pastEmpty');
+  const errorEl = document.getElementById('errorBanner');
+
+  // API base is fixed — no user-facing settings for it.
+  const API_BASE = 'http://127.0.0.1:8000';
+
+  // ---- Auth: token stored by Login.html via sessionStorage (never in the URL or on disk) ----
+  let authToken = sessionStorage.getItem('daybook_token') || '';
+
+  function decodeUsername(token){
+    try{
+      const payload = token.split('.')[1];
+      const json = JSON.parse(atob(payload.replace(/-/g,'+').replace(/_/g,'/')));
+      return json.sub || json.username || null;
+    }catch(e){ return null; }
+  }
+  const username = authToken ? decodeUsername(authToken) : null;
+  const fullName = sessionStorage.getItem('daybook_fullname') || null;
+  const displayName = fullName || username;
+
+  function timeGreeting(){
+    const h = new Date().getHours();
+    if(h < 12) return 'Good morning';
+    if(h < 18) return 'Good afternoon';
+    return 'Good evening';
+  }
+  if(displayName){
+    greeting.innerHTML = `${timeGreeting()}, <span class="user">${escapeHtml(displayName)}</span>`;
+  }else{
+    greeting.textContent = timeGreeting();
+    dateLine.insertAdjacentHTML('afterend', '');
+  }
+  dateLine.textContent = new Date().toLocaleDateString('en-US',{weekday:'long', month:'short', day:'numeric', year:'numeric'});
+
+  function apiBase(){
+    return API_BASE;
+  }
+  function showError(msg){
+    errorEl.textContent = msg;
+    errorEl.style.display = 'block';
+  }
+  function clearError(){
+    errorEl.style.display = 'none';
+  }
+  function markOk(){
+    // no-op — the status dot lived in the removed API settings panel.
+  }
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  async function api(path, opts){
+    const headers = {'Content-Type': 'application/json'};
+    if(authToken) headers['Authorization'] = `Bearer ${authToken}`;
+    const res = await fetch(apiBase() + path, { headers, ...opts });
+    if(res.status === 401){
+      throw new Error('401 Unauthorized — log in again.');
+    }
+    if(!res.ok){
+      let detail = res.statusText;
+      try{ const j = await res.json(); if(j.detail) detail = j.detail; }catch(e){}
+      throw new Error(`${res.status} ${detail}`);
+    }
+    if(res.status === 204) return null;
+    return res.json();
+  }
+
+  // ---- Mood ring ----
+  function renderMoodRow(){
+    moodRow.innerHTML = '';
+    MOODS.forEach(m => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'mood-btn' + (selectedMood === m.id ? ' selected' : '');
+      btn.style.setProperty('--mood-color', m.color);
+      btn.innerHTML = `<span class="glyph">${m.emoji}</span><span class="label">${m.label}</span>`;
+      btn.addEventListener('click', () => { selectedMood = m.id; renderMoodRow(); });
+      moodRow.appendChild(btn);
+    });
+  }
+  renderMoodRow();
+
+  diaryContent.addEventListener('input', () => {
+    charHint.textContent = `${diaryContent.value.length} / 4000`;
+  });
+
+  // ---- Diary entries ----
+  async function loadEntries(){
+    try{
+      const data = await api('/entries', { method: 'GET' });
+      entries = Array.isArray(data) ? data : [];
+      markOk();
+      clearError();
+    }catch(err){
+      entries = [];
+      showError(`Couldn't load past pages — ${err.message}. This assumes a GET /entries route; let me know if diary entries live at a different path.`);
+    }
+    renderPastPages();
+    renderStreak();
+  }
+
+  saveEntryBtn.addEventListener('click', async () => {
+    const content = diaryContent.value.trim();
+    if(!content){ diaryContent.focus(); return; }
+    saveEntryBtn.disabled = true;
+    saveEntryBtn.textContent = 'Saving…';
+    try{
+      const created = await api('/entries', {
+        method: 'POST',
+        body: JSON.stringify({ content, mood: selectedMood })
+      });
+      entries.unshift(created);
+      diaryContent.value = '';
+      charHint.textContent = '0 / 4000';
+      selectedMood = null;
+      renderMoodRow();
+      renderPastPages();
+      renderStreak();
+      clearError();
+      markOk();
+    }catch(err){
+      showError(`Couldn't save your entry — ${err.message}`);
+    }
+    saveEntryBtn.disabled = false;
+    saveEntryBtn.textContent = 'Save entry';
+  });
+
+  function moodColor(id){
+    const m = MOODS.find(m => m.id === id);
+    return m ? m.color : 'var(--ink-faint)';
+  }
+
+  function renderPastPages(){
+    pastPages.innerHTML = '';
+    pastEmpty.style.display = entries.length === 0 ? 'block' : 'none';
+    entries.forEach(e => {
+      const div = document.createElement('div');
+      div.className = 'page-entry';
+      const d = e.time_created ? new Date(e.time_created) : null;
+      const dateStr = d && !isNaN(d.getTime())
+        ? d.toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'})
+        : '';
+      div.innerHTML = `
+        <div class="page-entry-head">
+          <span class="page-mood-dot" style="background:${moodColor(e.mood)}"></span>
+          <span class="page-date">${dateStr}</span>
+          <span class="page-preview">${escapeHtml(e.content || '')}</span>
+        </div>
+        <div class="page-full">${escapeHtml(e.content || '')}</div>
+      `;
+      div.addEventListener('click', () => div.classList.toggle('expanded'));
+      pastPages.appendChild(div);
+    });
+  }
+
+  function renderStreak(){
+    // Consecutive days (including today) with at least one entry.
+    const days = new Set(
+      entries
+        .map(e => e.time_created ? new Date(e.time_created) : null)
+        .filter(Boolean)
+        .map(d => d.toDateString())
+    );
+    let streak = 0;
+    let cursor = new Date();
+    while(days.has(cursor.toDateString())){
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    streakNum.textContent = streak;
+  }
+
+  // ---- Tasks ----
+  async function loadTasks(){
+    try{
+      const data = await api('/', { method: 'GET' });
+      tasks = Array.isArray(data) ? data : [];
+      markOk();
+      clearError();
+    }catch(err){
+      tasks = [];
+      showError(`Couldn't load tasks — ${err.message}`);
+    }
+    renderTasks();
+  }
+
+  addTaskBtn.addEventListener('click', addTask);
+  taskInput.addEventListener('keydown', e => { if(e.key === 'Enter') addTask(); });
+
+  async function addTask(){
+    const title = taskInput.value.trim();
+    if(!title) return;
+    try{
+      const created = await api('/', {
+        method: 'POST',
+        body: JSON.stringify({ title, description: null })
+      });
+      tasks.push(created);
+      taskInput.value = '';
+      clearError();
+      markOk();
+      renderTasks();
+    }catch(err){
+      showError(`Couldn't add task — ${err.message}`);
+    }
+  }
+
+  async function toggleTask(id){
+    const t = tasks.find(t => t.id === id);
+    if(!t) return;
+    try{
+      const updated = await api(`/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ completed: !t.completed })
+      });
+      Object.assign(t, updated);
+      clearError();
+      markOk();
+      renderTasks();
+    }catch(err){
+      showError(`Couldn't update task — ${err.message}`);
+    }
+  }
+
+  async function deleteTask(id){
+    try{
+      await api(`/${id}`, { method: 'DELETE' });
+      tasks = tasks.filter(t => t.id !== id);
+      clearError();
+      markOk();
+      renderTasks();
+    }catch(err){
+      showError(`Couldn't delete task — ${err.message}`);
+    }
+  }
+
+  function checkSvg(){
+    return '<svg viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 5.5L4 8L9.5 2.5" stroke="#F8FAF3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+
+  function renderTasks(){
+    taskList.innerHTML = '';
+    tasksEmpty.style.display = tasks.length === 0 ? 'block' : 'none';
+    const activeCount = tasks.filter(t => !t.completed).length;
+    tasksSub.textContent = tasks.length === 0
+      ? 'Keep today moving.'
+      : `${activeCount} left of ${tasks.length}`;
+
+    tasks.forEach(t => {
+      const li = document.createElement('li');
+      li.className = 'task' + (t.completed ? ' done' : '');
+      li.innerHTML = `
+        <span class="box" role="checkbox" aria-checked="${t.completed}" tabindex="0">${checkSvg()}</span>
+        <span class="task-title">${escapeHtml(t.title || '')}</span>
+        <button class="task-del" aria-label="Delete task">✕</button>
+      `;
+      const box = li.querySelector('.box');
+      box.addEventListener('click', () => toggleTask(t.id));
+      box.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleTask(t.id);} });
+      li.querySelector('.task-del').addEventListener('click', () => deleteTask(t.id));
+      taskList.appendChild(li);
+    });
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    sessionStorage.removeItem('daybook_token');
+    sessionStorage.removeItem('daybook_fullname');
+    window.location.href = 'Login.html';
+  });
+
+  loadEntries();
+  loadTasks();
+})();
+</script>
+
+</body>
+</html>

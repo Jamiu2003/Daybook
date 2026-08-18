@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Daybook — Goals</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFF2E7;
+    --card:#F8FAF3;
+    --card-line:#DCE4CC;
+    --ink:#232E24;
+    --ink-soft:#66735F;
+    --ink-faint:#98A28F;
+    --rose:#CE7B92;
+    --rose-deep:#AD5D74;
+    --gold:#C79A3B;
+    --sage:#6C8F63;
+    --error:#B5504A;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 10% 0%, rgba(206,123,146,0.07), transparent 38%),
+      radial-gradient(circle at 92% 100%, rgba(108,143,99,0.09), transparent 42%);
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    min-height:100vh;
+    padding:40px 20px 80px;
+  }
+  .wrap{max-width:640px; margin:0 auto;}
+
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:26px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--rose-deep);
+    margin:0 0 6px;
+  }
+  h1.title{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-weight:400;
+    font-size:34px;
+    line-height:1.1;
+    margin:0;
+    color:var(--ink);
+  }
+  .sub{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin-top:6px;
+  }
+
+  nav.nav-row{
+    display:flex;
+    gap:22px;
+    margin:20px 0 22px;
+    border-bottom:1px solid var(--card-line);
+  }
+  nav.nav-row a{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:0 0 10px;
+    border-bottom:2px solid transparent;
+    transition:color .15s ease, border-color .15s ease;
+  }
+  nav.nav-row a:hover{color:var(--rose-deep);}
+  nav.nav-row a.active{
+    color:var(--ink);
+    font-weight:600;
+    border-bottom-color:var(--rose-deep);
+  }
+
+  details.advanced{margin-bottom:20px;}
+  details.advanced summary{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    cursor:pointer;
+    list-style:none;
+    user-select:none;
+    display:flex;
+    align-items:center;
+    gap:7px;
+  }
+  details.advanced summary::-webkit-details-marker{display:none;}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--ink-faint); flex-shrink:0;}
+  .dot.ok{background:var(--sage);}
+  .dot.bad{background:var(--error);}
+  details.advanced .api-row{display:flex; align-items:center; gap:8px; margin-top:10px;}
+  details.advanced input{
+    flex:1;
+    background:var(--card);
+    border:1px solid var(--card-line);
+    border-radius:8px;
+    color:var(--ink);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    padding:7px 9px;
+    outline:none;
+  }
+
+  .error-banner{
+    font-size:13px;
+    color:var(--error);
+    background:rgba(181,80,74,0.08);
+    border:1px solid rgba(181,80,74,0.25);
+    border-radius:10px;
+    padding:11px 14px;
+    margin-bottom:18px;
+    display:none;
+    line-height:1.45;
+  }
+
+  /* ---------- Add goal ---------- */
+  .add-card{
+    background:var(--card);
+    border:1px solid var(--card-line);
+    border-radius:18px;
+    box-shadow:0 20px 50px -32px rgba(35,46,36,0.4);
+    padding:20px;
+    margin-bottom:22px;
+  }
+  .add-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .add-row input[type="text"]{
+    flex:1;
+    min-width:160px;
+    background:var(--paper);
+    border:1.5px solid var(--card-line);
+    border-radius:11px;
+    outline:none;
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    font-size:14.5px;
+    padding:11px 13px;
+  }
+  .add-row input[type="date"]{
+    background:var(--paper);
+    border:1.5px solid var(--card-line);
+    border-radius:11px;
+    outline:none;
+    color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    padding:11px 12px;
+    flex-shrink:0;
+  }
+  .add-row input::placeholder{color:var(--ink-faint);}
+  .add-row input:focus{border-color:var(--rose);}
+  button.primary{
+    background:var(--ink);
+    border:none;
+    color:var(--paper);
+    font-family:'Work Sans',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    padding:11px 20px;
+    border-radius:11px;
+    cursor:pointer;
+    transition:background .15s ease, transform .1s ease;
+    flex-shrink:0;
+  }
+  button.primary:hover{background:var(--rose-deep);}
+  button.primary:active{transform:scale(0.97);}
+  button.primary:disabled{opacity:0.45; cursor:default; transform:none;}
+
+  /* ---------- Goal cards ---------- */
+  .goal-card{
+    background:var(--card);
+    border:1px solid var(--card-line);
+    border-radius:18px;
+    box-shadow:0 20px 50px -32px rgba(35,46,36,0.4);
+    padding:22px;
+    margin-bottom:16px;
+  }
+  .goal-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+  }
+  .goal-title{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-weight:400;
+    font-size:21px;
+    color:var(--ink);
+    margin:0 0 3px;
+  }
+  .goal-due{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+  .goal-del{
+    background:none; border:none; color:var(--ink-faint);
+    font-size:14px; cursor:pointer; padding:4px; flex-shrink:0;
+    transition:color .12s ease;
+  }
+  .goal-del:hover{color:var(--error);}
+
+  .progress-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:14px 0 4px;
+  }
+  .progress-track{
+    flex:1;
+    height:7px;
+    background:var(--paper);
+    border-radius:99px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--sage);
+    border-radius:99px;
+    transition:width .25s ease;
+  }
+  .progress-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    flex-shrink:0;
+  }
+
+  ul.milestones{list-style:none; margin:14px 0 0; padding:0;}
+  li.milestone{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:8px 0;
+    border-top:1px solid var(--card-line);
+  }
+  .box{
+    width:18px;height:18px;
+    border:1.5px solid var(--ink-faint);
+    border-radius:6px;
+    flex-shrink:0;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .box:hover{border-color:var(--sage);}
+  .box svg{width:10px; height:10px; opacity:0; transition:opacity .1s ease;}
+  li.milestone.done .box{border-color:var(--sage); background:var(--sage);}
+  li.milestone.done .box svg{opacity:1;}
+  .milestone-title{flex:1; font-size:14px; word-break:break-word;}
+  li.milestone.done .milestone-title{color:var(--ink-faint); text-decoration:line-through;}
+  .milestone-del{
+    background:none; border:none; color:var(--ink-faint);
+    font-size:13px; cursor:pointer; padding:3px; opacity:0;
+    transition:opacity .12s ease, color .12s ease;
+  }
+  li.milestone:hover .milestone-del{opacity:1;}
+  .milestone-del:hover{color:var(--error);}
+
+  .add-milestone-row{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+  }
+  .add-milestone-row input{
+    flex:1;
+    background:var(--paper);
+    border:1.5px solid var(--card-line);
+    border-radius:10px;
+    outline:none;
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    font-size:13.5px;
+    padding:9px 12px;
+  }
+  .add-milestone-row input::placeholder{color:var(--ink-faint);}
+  .add-milestone-row input:focus{border-color:var(--rose);}
+  .add-milestone-row button{
+    background:none;
+    border:1.5px solid var(--card-line);
+    color:var(--ink-soft);
+    width:36px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:16px;
+    line-height:1;
+    flex-shrink:0;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .add-milestone-row button:hover{border-color:var(--rose); color:var(--rose-deep);}
+
+  .milestones-empty{
+    font-size:12.5px;
+    color:var(--ink-faint);
+    padding:10px 0 2px;
+  }
+
+  .goals-empty{
+    text-align:center;
+    color:var(--ink-faint);
+    font-size:13.5px;
+    padding:30px 0;
+  }
+
+  input:focus-visible, button:focus-visible, .box:focus-visible{
+    outline:2px solid var(--rose);
+    outline-offset:2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="topbar">
+    <div>
+      <p class="eyebrow">Daybook</p>
+      <h1 class="title">Goals.</h1>
+      <p class="sub">The bigger things, tracked in milestones.</p>
+    </div>
+  </div>
+
+  <nav class="nav-row">
+    <a href="TodoApp.html">Today</a>
+    <a href="Goals.html" class="active">Goals</a>
+  </nav>
+
+  <details class="advanced">
+    <summary><span class="dot" id="statusDot"></span> </summary>
+    <div class="api-row">
+      <input id="apiBase" type="text" value="http://127.0.0.1:8000" spellcheck="false" />
+    </div>
+  </details>
+
+  <div id="errorBanner" class="error-banner"></div>
+
+  <div class="add-card">
+    <div class="add-row">
+      <input id="goalTitleInput" type="text" placeholder="e.g. Learn to swim" maxlength="140" />
+      <input id="goalDateInput" type="date" />
+      <button class="primary" id="addGoalBtn">Add goal</button>
+    </div>
+  </div>
+
+  <div id="goalsList"></div>
+  <div class="goals-empty" id="goalsEmpty" style="display:none;">No goals yet — add your first one above.</div>
+
+</div>
+
+<script>
+(function(){
+  let goals = [];
+
+  const goalTitleInput = document.getElementById('goalTitleInput');
+  const goalDateInput = document.getElementById('goalDateInput');
+  const addGoalBtn = document.getElementById('addGoalBtn');
+  const goalsList = document.getElementById('goalsList');
+  const goalsEmpty = document.getElementById('goalsEmpty');
+  const apiBaseInput = document.getElementById('apiBase');
+  const statusDot = document.getElementById('statusDot');
+  const errorEl = document.getElementById('errorBanner');
+
+  let authToken = sessionStorage.getItem('daybook_token') || '';
+
+  function apiBase(){ return apiBaseInput.value.trim().replace(/\/$/, ''); }
+  function showError(msg){ errorEl.textContent = msg; errorEl.style.display = 'block'; statusDot.className = 'dot bad'; }
+  function clearError(){ errorEl.style.display = 'none'; }
+  function markOk(){ statusDot.className = 'dot ok'; }
+  function escapeHtml(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+  async function api(path, opts){
+    const headers = {'Content-Type': 'application/json'};
+    if(authToken) headers['Authorization'] = `Bearer ${authToken}`;
+    const res = await fetch(apiBase() + path, { headers, ...opts });
+    if(res.status === 401){
+      throw new Error('401 Unauthorized — log in again.');
+    }
+    if(!res.ok){
+      let detail = res.statusText;
+      try{ const j = await res.json(); if(j.detail) detail = j.detail; }catch(e){}
+      throw new Error(`${res.status} ${detail}`);
+    }
+    if(res.status === 204) return null;
+    return res.json();
+  }
+
+  async function loadGoals(){
+    try{
+      const data = await api('/goals', { method: 'GET' });
+      goals = Array.isArray(data) ? data : [];
+      markOk();
+      clearError();
+    }catch(err){
+      goals = [];
+      showError(`Couldn't load goals — ${err.message}. This assumes a GET /goals route returning each goal with a nested "milestones" list.`);
+    }
+    renderGoals();
+  }
+
+  addGoalBtn.addEventListener('click', async () => {
+    const title = goalTitleInput.value.trim();
+    if(!title) return;
+    const target_date = goalDateInput.value || null;
+    addGoalBtn.disabled = true;
+    try{
+      const created = await api('/goals', {
+        method: 'POST',
+        body: JSON.stringify({ title, target_date })
+      });
+      created.milestones = created.milestones || [];
+      goals.unshift(created);
+      goalTitleInput.value = '';
+      goalDateInput.value = '';
+      clearError();
+      markOk();
+      renderGoals();
+    }catch(err){
+      showError(`Couldn't add goal — ${err.message}`);
+    }
+    addGoalBtn.disabled = false;
+  });
+  goalTitleInput.addEventListener('keydown', e => { if(e.key === 'Enter') addGoalBtn.click(); });
+
+  async function deleteGoal(goalId){
+    try{
+      await api(`/goals/${goalId}`, { method: 'DELETE' });
+      goals = goals.filter(g => g.id !== goalId);
+      clearError();
+      markOk();
+      renderGoals();
+    }catch(err){
+      showError(`Couldn't delete goal — ${err.message}`);
+    }
+  }
+
+  async function addMilestone(goalId, input){
+    const title = input.value.trim();
+    if(!title) return;
+    try{
+      const created = await api(`/goals/${goalId}/milestones`, {
+        method: 'POST',
+        body: JSON.stringify({ title })
+      });
+      const goal = goals.find(g => g.id === goalId);
+      goal.milestones = goal.milestones || [];
+      goal.milestones.push(created);
+      input.value = '';
+      clearError();
+      markOk();
+      renderGoals();
+    }catch(err){
+      showError(`Couldn't add milestone — ${err.message}`);
+    }
+  }
+
+  async function toggleMilestone(goalId, milestoneId){
+    const goal = goals.find(g => g.id === goalId);
+    const m = goal.milestones.find(m => m.id === milestoneId);
+    if(!m) return;
+    try{
+      const updated = await api(`/milestones/${milestoneId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ completed: !m.completed })
+      });
+      Object.assign(m, updated);
+      clearError();
+      markOk();
+      renderGoals();
+    }catch(err){
+      showError(`Couldn't update milestone — ${err.message}`);
+    }
+  }
+
+  async function deleteMilestone(goalId, milestoneId){
+    try{
+      await api(`/milestones/${milestoneId}`, { method: 'DELETE' });
+      const goal = goals.find(g => g.id === goalId);
+      goal.milestones = goal.milestones.filter(m => m.id !== milestoneId);
+      clearError();
+      markOk();
+      renderGoals();
+    }catch(err){
+      showError(`Couldn't delete milestone — ${err.message}`);
+    }
+  }
+
+  function checkSvg(){
+    return '<svg viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.3 5L3.6 7.3L8.7 2.2" stroke="#F8FAF3" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+
+  function formatDate(iso){
+    if(!iso) return '';
+    const d = new Date(iso + (iso.length === 10 ? 'T00:00:00' : ''));
+    if(isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  }
+
+  function renderGoals(){
+    goalsList.innerHTML = '';
+    goalsEmpty.style.display = goals.length === 0 ? 'block' : 'none';
+
+    goals.forEach(goal => {
+      const milestones = goal.milestones || [];
+      const doneCount = milestones.filter(m => m.completed).length;
+      const total = milestones.length;
+      const pct = total === 0 ? 0 : Math.round((doneCount / total) * 100);
+
+      const card = document.createElement('div');
+      card.className = 'goal-card';
+      card.innerHTML = `
+        <div class="goal-head">
+          <div>
+            <p class="goal-title">${escapeHtml(goal.title || '')}</p>
+            ${goal.target_date ? `<div class="goal-due">Target: ${formatDate(goal.target_date)}</div>` : ''}
+          </div>
+          <button class="goal-del" aria-label="Delete goal">✕</button>
+        </div>
+
+        <div class="progress-row">
+          <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+          <span class="progress-label">${doneCount} / ${total}</span>
+        </div>
+
+        <ul class="milestones"></ul>
+        ${total === 0 ? '<div class="milestones-empty">No milestones yet.</div>' : ''}
+
+        <div class="add-milestone-row">
+          <input type="text" placeholder="Add a milestone" maxlength="140" />
+          <button type="button" aria-label="Add milestone">+</button>
+        </div>
+      `;
+
+      card.querySelector('.goal-del').addEventListener('click', () => deleteGoal(goal.id));
+
+      const ul = card.querySelector('.milestones');
+      milestones.forEach(m => {
+        const li = document.createElement('li');
+        li.className = 'milestone' + (m.completed ? ' done' : '');
+        li.innerHTML = `
+          <span class="box" role="checkbox" aria-checked="${m.completed}" tabindex="0">${checkSvg()}</span>
+          <span class="milestone-title">${escapeHtml(m.title || '')}</span>
+          <button class="milestone-del" aria-label="Delete milestone">✕</button>
+        `;
+        const box = li.querySelector('.box');
+        box.addEventListener('click', () => toggleMilestone(goal.id, m.id));
+        box.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleMilestone(goal.id, m.id);} });
+        li.querySelector('.milestone-del').addEventListener('click', () => deleteMilestone(goal.id, m.id));
+        ul.appendChild(li);
+      });
+
+      const msInput = card.querySelector('.add-milestone-row input');
+      const msBtn = card.querySelector('.add-milestone-row button');
+      msBtn.addEventListener('click', () => addMilestone(goal.id, msInput));
+      msInput.addEventListener('keydown', e => { if(e.key === 'Enter') addMilestone(goal.id, msInput); });
+
+      goalsList.appendChild(card);
+    });
+  }
+
+  apiBaseInput.addEventListener('change', loadGoals);
+
+  loadGoals();
+})();
+</script>
+
+</body>
+</html>
