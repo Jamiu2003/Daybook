@@ -87,37 +87,6 @@
     border-bottom-color:var(--rose-deep);
   }
 
-  details.advanced{margin-bottom:20px;}
-  details.advanced summary{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:10.5px;
-    letter-spacing:0.06em;
-    text-transform:uppercase;
-    color:var(--ink-faint);
-    cursor:pointer;
-    list-style:none;
-    user-select:none;
-    display:flex;
-    align-items:center;
-    gap:7px;
-  }
-  details.advanced summary::-webkit-details-marker{display:none;}
-  .dot{width:6px;height:6px;border-radius:50%;background:var(--ink-faint); flex-shrink:0;}
-  .dot.ok{background:var(--sage);}
-  .dot.bad{background:var(--error);}
-  details.advanced .api-row{display:flex; align-items:center; gap:8px; margin-top:10px;}
-  details.advanced input{
-    flex:1;
-    background:var(--card);
-    border:1px solid var(--card-line);
-    border-radius:8px;
-    color:var(--ink);
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
-    padding:7px 9px;
-    outline:none;
-  }
-
   .error-banner{
     font-size:13px;
     color:var(--error);
@@ -342,13 +311,6 @@
     <a href="Goals.html" class="active">Goals</a>
   </nav>
 
-  <details class="advanced">
-    <summary><span class="dot" id="statusDot"></span> </summary>
-    <div class="api-row">
-      <input id="apiBase" type="text" value="http://127.0.0.1:8000" spellcheck="false" />
-    </div>
-  </details>
-
   <div id="errorBanner" class="error-banner"></div>
 
   <div class="add-card">
@@ -373,16 +335,17 @@
   const addGoalBtn = document.getElementById('addGoalBtn');
   const goalsList = document.getElementById('goalsList');
   const goalsEmpty = document.getElementById('goalsEmpty');
-  const apiBaseInput = document.getElementById('apiBase');
-  const statusDot = document.getElementById('statusDot');
   const errorEl = document.getElementById('errorBanner');
+
+  // API base is fixed — no user-facing settings for it.
+  const API_BASE = 'http://127.0.0.1:8000';
 
   let authToken = sessionStorage.getItem('daybook_token') || '';
 
-  function apiBase(){ return apiBaseInput.value.trim().replace(/\/$/, ''); }
-  function showError(msg){ errorEl.textContent = msg; errorEl.style.display = 'block'; statusDot.className = 'dot bad'; }
+  function apiBase(){ return API_BASE; }
+  function showError(msg){ errorEl.textContent = msg; errorEl.style.display = 'block'; }
   function clearError(){ errorEl.style.display = 'none'; }
-  function markOk(){ statusDot.className = 'dot ok'; }
+  function markOk(){ /* no-op — status dot lived in the removed API settings panel */ }
   function escapeHtml(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
 
   async function api(path, opts){
@@ -573,8 +536,6 @@
       goalsList.appendChild(card);
     });
   }
-
-  apiBaseInput.addEventListener('change', loadGoals);
 
   loadGoals();
 })();
