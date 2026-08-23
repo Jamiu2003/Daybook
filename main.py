@@ -10,11 +10,14 @@ from dependencies import get_current_user
 from security import hash_password, verify_password, create_access_token
 from fastapi.security import OAuth2PasswordRequestForm
 import model
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 
 
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="frontend"), name="static")
 router = APIRouter()
 Base.metadata.create_all(bind=engine)
 app.include_router(router)

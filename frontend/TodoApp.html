@@ -469,7 +469,7 @@
   // API base is fixed — no user-facing settings for it.
   const API_BASE = 'http://127.0.0.1:8000';
 
-  // ---- Auth: token stored by Login.html via sessionStorage (never in the URL or on disk) ----
+  // ---- Auth: token stored by index.html (login page) via sessionStorage (never in the URL or on disk) ----
   let authToken = sessionStorage.getItem('daybook_token') || '';
 
   function decodeUsername(token){
@@ -732,7 +732,7 @@
   document.getElementById('logoutBtn').addEventListener('click', () => {
     sessionStorage.removeItem('daybook_token');
     sessionStorage.removeItem('daybook_fullname');
-    window.location.href = 'Login.html';
+    window.location.href = 'index.html';
   });
 
   loadEntries();
