@@ -36,6 +36,14 @@ app.add_middleware(
 def serve_login_page():
     return FileResponse("frontend/index.html")
 
+@app.get("/Register.html")
+def serve_register_page():
+    return FileResponse("frontend/Register.html")
+
+@app.get("/TodoApp.html")
+def serve_todo_page():
+    return FileResponse("frontend/TodoApp.html")
+
 @router.post("/entries", response_model = EntryResponse)
 def create_entry(entry:EntryCreate, db:Session = Depends(get_db), current_user:User = Depends(get_current_user)):
     new_entry = Entry(
@@ -184,7 +192,7 @@ def create_todo(todo:TodoCreate, db:Session = Depends(get_db), current_user:User
 
     return new_todo
 
-@router.get("/{todo_id}",response_model = GetTodo)
+@router.get("/todolist/{todo_id}",response_model = GetTodo)
 def get_todo(todo_id = int,db:Session = Depends(get_db), current_user:User = Depends(get_current_user)):
     
     #todos = db.query(Todo).filter(Todo.id == todo_id)
