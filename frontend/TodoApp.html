@@ -473,7 +473,7 @@
   // ---- Auth guard: no token means straight to the login page, before anything else runs ----
   let authToken = sessionStorage.getItem('daybook_token') || '';
   if(!authToken){
-    window.location.href = 'index.html';
+    window.location.href = '/';
     return;
   }
 
@@ -737,7 +737,7 @@
   document.getElementById('logoutBtn').addEventListener('click', () => {
     sessionStorage.removeItem('daybook_token');
     sessionStorage.removeItem('daybook_fullname');
-    window.location.href = 'index.html';
+    window.location.href = '/';
   });
 
   loadEntries();
