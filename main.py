@@ -17,7 +17,7 @@ from fastapi.responses import FileResponse
 
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="frontend"), name="static")
+app.mount("/static", StaticFiles(directory="frontend "), name="static")
 router = APIRouter()
 Base.metadata.create_all(bind=engine)
 app.include_router(router)

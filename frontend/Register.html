@@ -229,7 +229,7 @@
       <details class="advanced">
         <summary>API settings</summary>
         <div class="api-row">
-          <input id="apiBase" type="text" value="http://127.0.0.1:8000" spellcheck="false" />
+          <input id="apiBase" type="text" spellcheck="false" />
         </div>
       </details>
     </form>
@@ -238,6 +238,7 @@
   <div class="switch">Already keeping a page? <a href="index.html">Log in</a></div>
 </div>
 
+<script src="config.js"></script>
 <script>
 (function(){
   const form = document.getElementById('registerForm');
@@ -249,6 +250,7 @@
   const submitBtn = document.getElementById('submitBtn');
   const banner = document.getElementById('banner');
   const apiBaseInput = document.getElementById('apiBase');
+  apiBaseInput.value = window.DAYBOOK_API_BASE || 'http://127.0.0.1:8000';
 
   function apiBase(){
     return apiBaseInput.value.trim().replace(/\/$/, '');

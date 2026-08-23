@@ -222,7 +222,7 @@
       <details class="advanced">
         <summary>API settings</summary>
         <div class="api-row">
-          <input id="apiBase" type="text" value="http://127.0.0.1:8000" spellcheck="false" />
+          <input id="apiBase" type="text" spellcheck="false" />
         </div>
       </details>
     </form>
@@ -231,6 +231,7 @@
   <div class="switch">New here? <a href="Register.html">Create an account</a></div>
 </div>
 
+<script src="config.js"></script>
 <script>
 (function(){
   const form = document.getElementById('loginForm');
@@ -240,6 +241,7 @@
   const submitLabel = document.getElementById('submitLabel');
   const banner = document.getElementById('banner');
   const apiBaseInput = document.getElementById('apiBase');
+  apiBaseInput.value = window.DAYBOOK_API_BASE || 'http://127.0.0.1:8000';
 
   // A full name like "Musa Jamiu Omeiza" greets as just "Omeiza" — the last
   // word — rather than the whole name. A single-word name passes through as-is.

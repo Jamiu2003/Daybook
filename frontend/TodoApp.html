@@ -435,6 +435,7 @@
 
 </div>
 
+<script src="config.js"></script>
 <script>
 (function(){
   const MOODS = [
@@ -466,11 +467,15 @@
   const pastEmpty = document.getElementById('pastEmpty');
   const errorEl = document.getElementById('errorBanner');
 
-  // API base is fixed — no user-facing settings for it.
-  const API_BASE = 'http://127.0.0.1:8000';
+  // API base comes from the shared config.js — update that one file, not this one.
+  const API_BASE = window.DAYBOOK_API_BASE || 'http://127.0.0.1:8000';
 
-  // ---- Auth: token stored by index.html (login page) via sessionStorage (never in the URL or on disk) ----
+  // ---- Auth guard: no token means straight to the login page, before anything else runs ----
   let authToken = sessionStorage.getItem('daybook_token') || '';
+  if(!authToken){
+    window.location.href = 'index.html';
+    return;
+  }
 
   function decodeUsername(token){
     try{
