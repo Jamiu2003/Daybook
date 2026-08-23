@@ -645,7 +645,7 @@
   // ---- Tasks ----
   async function loadTasks(){
     try{
-      const data = await api('/', { method: 'GET' });
+      const data = await api('/todolist', { method: 'GET' });
       tasks = Array.isArray(data) ? data : [];
       markOk();
       clearError();
@@ -663,7 +663,7 @@
     const title = taskInput.value.trim();
     if(!title) return;
     try{
-      const created = await api('/', {
+      const created = await api('/todolist', {
         method: 'POST',
         body: JSON.stringify({ title, description: null })
       });
@@ -681,7 +681,7 @@
     const t = tasks.find(t => t.id === id);
     if(!t) return;
     try{
-      const updated = await api(`/${id}`, {
+      const updated = await api(`/todolist/${id}`, {
         method: 'PUT',
         body: JSON.stringify({ completed: !t.completed })
       });
@@ -696,7 +696,7 @@
 
   async function deleteTask(id){
     try{
-      await api(`/${id}`, { method: 'DELETE' });
+      await api(`/todolist/${id}`, { method: 'DELETE' });
       tasks = tasks.filter(t => t.id !== id);
       clearError();
       markOk();

@@ -32,6 +32,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def serve_login_page():
+    return FileResponse("frontend/index.html")
+
 @router.post("/entries", response_model = EntryResponse)
 def create_entry(entry:EntryCreate, db:Session = Depends(get_db), current_user:User = Depends(get_current_user)):
     new_entry = Entry(
@@ -51,7 +55,7 @@ def list_entries(db:Session = Depends(get_db), current_user:User = Depends(get_c
     return result.scalars().all()
 
 
-@router.get("/", response_model= list[GetTodo])
+@router.get("/todolist", response_model= list[GetTodo])
 def todo_list(db:Session = Depends(get_db), current_user:User =Depends(get_current_user)):
     result = db.execute(select(Todo).where(Todo.user_id == current_user.id))
     todo = result.scalars().all()
@@ -167,7 +171,7 @@ def update_milestone(milestone_id:int, db:Session = Depends(get_db), current_use
 
 
 
-@router.post("/", response_model=GetTodo)
+@router.post("/todolist", response_model=GetTodo)
 def create_todo(todo:TodoCreate, db:Session = Depends(get_db), current_user:User = Depends(get_current_user)):
     new_todo = Todo(
         title = todo.title,
@@ -190,7 +194,7 @@ def get_todo(todo_id = int,db:Session = Depends(get_db), current_user:User = Dep
         raise HTTPException(status_code=404, detail= f"{todo_id} not found")
     return todos
 
-@router.put("/{todo_id}", response_model = TodoUpdate)
+@router.put("/todolist/{todo_id}", response_model = TodoUpdate)
 def update(todo_id: int, todo_data: TodoUpdate, db:Session = Depends(get_db), current_user:User = Depends(get_current_user)):
     result = db.execute(select(Todo).where(Todo.id == todo_id, Todo.user_id == current_user.id))
     todo = result.scalar_one_or_none()
@@ -208,7 +212,7 @@ def update(todo_id: int, todo_data: TodoUpdate, db:Session = Depends(get_db), cu
 
     return todo
 
-@router.delete("/{todo_id}")
+@router.delete("/todolist/{todo_id}")
 def delete_todo(todo_id: int, db:Session = Depends(get_db), current_user:User = Depends(get_current_user)):
     result = db.execute(select(Todo).where(Todo.id == todo_id, Todo.user_id == current_user.id))
     todo = result.scalar_one_or_none()
