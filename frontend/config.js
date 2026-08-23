@@ -1,0 +1,1 @@
+window.DAYBOOK_API_BASE = "https://daybook-iota-peach.vercel.app";
