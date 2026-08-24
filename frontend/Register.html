@@ -244,11 +244,11 @@
   const confirmInput = document.getElementById('confirm');
   const submitBtn = document.getElementById('submitBtn');
   const banner = document.getElementById('banner');
-  const apiBaseInput = document.getElementById('apiBase');
-  apiBaseInput.value = window.DAYBOOK_API_BASE || 'http://127.0.0.1:8000';
+  
 
   function apiBase(){
-    return apiBaseInput.value.trim().replace(/\/$/, '');
+  return (window.DAYBOOK_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, '');
+
   }
   function showBanner(kind, msg){
     banner.className = 'banner ' + kind;
