@@ -325,7 +325,7 @@
   <div class="goals-empty" id="goalsEmpty" style="display:none;">No goals yet — add your first one above.</div>
 
 </div>
-
+<script src="/static/config.js"></script>
 <script>
 (function(){
   let goals = [];
@@ -338,7 +338,7 @@
   const errorEl = document.getElementById('errorBanner');
 
   // API base is fixed — no user-facing settings for it.
-  const API_BASE = 'http://127.0.0.1:8000';
+  const API_BASE = window.DAYBOOK_API_BASE || 'http://127.0.0.1:8000';
 
   let authToken = sessionStorage.getItem('daybook_token') || '';
 
