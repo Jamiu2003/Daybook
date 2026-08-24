@@ -235,9 +235,7 @@
   const submitBtn = document.getElementById('submitBtn');
   const submitLabel = document.getElementById('submitLabel');
   const banner = document.getElementById('banner');
-  const apiBaseInput = document.getElementById('apiBase');
-  apiBaseInput.value = window.DAYBOOK_API_BASE || 'http://127.0.0.1:8000';
-
+  
   // A full name like "Musa Jamiu Omeiza" greets as just "Omeiza" — the last
   // word — rather than the whole name. A single-word name passes through as-is.
   function toDisplayName(fullName){
@@ -246,9 +244,10 @@
     return parts.length ? parts[parts.length - 1] : null;
   }
 
-  function apiBase(){
-    return apiBaseInput.value.trim().replace(/\/$/, '');
+    function apiBase(){
+    return (window.DAYBOOK_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, '');
   }
+  
   function showBanner(kind, msg){
     banner.className = 'banner ' + kind;
     banner.textContent = msg;
