@@ -44,6 +44,10 @@ def serve_register_page():
 def serve_todo_page():
     return FileResponse("frontend/TodoApp.html")
 
+@app.get("/Goals.html")
+def serve_goals_page():
+    return FileResponse("frontend/Goals.html")
+
 @router.post("/entries", response_model = EntryResponse)
 def create_entry(entry:EntryCreate, db:Session = Depends(get_db), current_user:User = Depends(get_current_user)):
     new_entry = Entry(
@@ -98,7 +102,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db:Session = Depends
     result = db.execute(select(User).where(User.username == form_data.username))
     user = result.scalar_one_or_none()
     if user is None or not verify_password(form_data.password, user.password_hash):
-        raise HTTPException(status_code = 401, detail = "Invalid username or email")
+        raise HTTPException(status_code = 401, detail = "Invalid username or password")
     access_token = create_access_token(user.username)
     return {
         "access_token": access_token,
