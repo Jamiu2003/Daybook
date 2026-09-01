@@ -33,6 +33,10 @@ app.add_middleware(
 )
 
 @app.get("/")
+def serve_home_page():
+    return FileResponse("frontend/Home.html")
+
+@app.get("/Login.html")
 def serve_login_page():
     return FileResponse("frontend/index.html")
 

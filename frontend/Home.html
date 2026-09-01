@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Daybook — A page for every day</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Write how today went, clear what needs doing, and watch bigger goals take shape — one page at a time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFF2E7;
+    --card:#F8FAF3;
+    --card-line:#DCE4CC;
+    --ink:#232E24;
+    --ink-soft:#66735F;
+    --ink-faint:#98A28F;
+    --rose:#CE7B92;
+    --rose-deep:#AD5D74;
+    --gold:#C79A3B;
+    --sage:#6C8F63;
+    --error:#B5504A;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 8% 6%, rgba(206,123,146,0.10), transparent 40%),
+      radial-gradient(circle at 94% 88%, rgba(108,143,99,0.12), transparent 45%);
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    min-height:100vh;
+  }
+  a{color:inherit;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+
+  /* ---------- Top nav ---------- */
+  header.topnav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:26px 0 0;
+  }
+  .brand{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--rose-deep);
+    font-weight:500;
+  }
+  .nav-links{display:flex; align-items:center; gap:18px;}
+  .nav-links a{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    text-decoration:none;
+    color:var(--ink-soft);
+    transition:color .15s ease;
+  }
+  .nav-links a:hover{color:var(--ink);}
+  .nav-links a.cta{
+    background:var(--ink);
+    color:var(--paper);
+    padding:9px 16px;
+    border-radius:9px;
+    transition:background .15s ease;
+  }
+  .nav-links a.cta:hover{background:var(--rose-deep); color:var(--paper);}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    display:grid;
+    grid-template-columns:1.05fr 0.95fr;
+    gap:56px;
+    align-items:center;
+    padding:76px 0 90px;
+  }
+  .hero-eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--sage);
+    margin:0 0 16px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .hero-eyebrow::before{
+    content:'';
+    width:6px;height:6px;border-radius:50%;
+    background:var(--sage);
+    display:inline-block;
+  }
+  h1.hero-title{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-weight:400;
+    font-size:56px;
+    line-height:1.05;
+    margin:0 0 22px;
+    color:var(--ink);
+  }
+  p.hero-sub{
+    font-size:16.5px;
+    line-height:1.6;
+    color:var(--ink-soft);
+    max-width:440px;
+    margin:0 0 32px;
+  }
+  .hero-ctas{display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    font-family:'Work Sans',sans-serif;
+    font-weight:600;
+    font-size:14.5px;
+    padding:14px 24px;
+    border-radius:11px;
+    text-decoration:none;
+    display:inline-block;
+    transition:background .15s ease, transform .1s ease;
+  }
+  .btn-primary:hover{background:var(--rose-deep); transform:translateY(-1px);}
+  .btn-secondary{
+    font-family:'Work Sans',sans-serif;
+    font-weight:600;
+    font-size:14.5px;
+    color:var(--ink);
+    text-decoration:none;
+    padding:14px 6px;
+    border-bottom:2px solid var(--card-line);
+    transition:border-color .15s ease;
+  }
+  .btn-secondary:hover{border-color:var(--rose-deep);}
+
+  /* ---------- Signature: live page preview ---------- */
+  .preview-shell{
+    background:var(--card);
+    border:1px solid var(--card-line);
+    border-radius:22px;
+    box-shadow:0 30px 70px -34px rgba(35,46,36,0.45);
+    padding:26px;
+    position:relative;
+  }
+  .preview-shell::before{
+    content:'';
+    position:absolute;
+    top:14px; left:14px; right:-10px; bottom:-10px;
+    background:var(--paper);
+    border:1px solid var(--card-line);
+    border-radius:22px;
+    z-index:-1;
+  }
+  .preview-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+  }
+  .preview-date{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+  }
+  .preview-streak{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--gold);
+    display:flex;
+    align-items:center;
+    gap:5px;
+  }
+  .mood-row-preview{display:flex; gap:7px; margin-bottom:16px;}
+  .mood-dot-preview{
+    flex:1;
+    border:1.5px solid var(--card-line);
+    border-radius:11px;
+    padding:9px 0;
+    text-align:center;
+    font-size:14px;
+    transition:border-color .3s ease, background .3s ease, transform .3s ease;
+  }
+  .mood-dot-preview.on{
+    border-color:var(--rose);
+    background:rgba(206,123,146,0.12);
+    transform:translateY(-2px);
+  }
+  .preview-entry{
+    min-height:64px;
+    background:var(--paper);
+    border:1.5px solid var(--card-line);
+    border-radius:12px;
+    padding:12px 14px;
+    font-size:13.5px;
+    line-height:1.55;
+    color:var(--ink);
+    margin-bottom:16px;
+  }
+  .preview-entry .cursor{
+    display:inline-block;
+    width:2px; height:14px;
+    background:var(--ink-soft);
+    margin-left:1px;
+    animation:blink 0.9s step-end infinite;
+    vertical-align:middle;
+  }
+  @keyframes blink{50%{opacity:0;}}
+  ul.preview-tasks{list-style:none; margin:0; padding:0;}
+  li.ptask{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:7px 0;
+    border-top:1px solid var(--card-line);
+    font-size:13.5px;
+  }
+  li.ptask:first-child{border-top:none;}
+  .pbox{
+    width:16px;height:16px;
+    border:1.5px solid var(--ink-faint);
+    border-radius:5px;
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; color:var(--paper);
+    transition:border-color .3s ease, background .3s ease;
+  }
+  li.ptask.done .pbox{border-color:var(--sage); background:var(--sage);}
+  li.ptask.done span.ptask-label{color:var(--ink-faint); text-decoration:line-through;}
+
+  /* ---------- Features ---------- */
+  .features{padding:20px 0 88px;}
+  .features-head{max-width:480px; margin-bottom:40px;}
+  .features-eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--rose-deep);
+    margin:0 0 10px;
+  }
+  h2.features-title{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-weight:400;
+    font-size:30px;
+    margin:0;
+    color:var(--ink);
+  }
+  .feature-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:20px;
+  }
+  .feature-card{
+    background:var(--card);
+    border:1px solid var(--card-line);
+    border-radius:18px;
+    padding:26px 24px;
+    box-shadow:0 20px 50px -36px rgba(35,46,36,0.35);
+  }
+  .feature-glyph{
+    width:38px; height:38px;
+    border-radius:11px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:17px;
+    margin-bottom:16px;
+  }
+  .feature-glyph.rose{background:rgba(206,123,146,0.15); color:var(--rose-deep);}
+  .feature-glyph.sage{background:rgba(108,143,99,0.15); color:var(--sage);}
+  .feature-glyph.gold{background:rgba(199,154,59,0.15); color:var(--gold);}
+  .feature-card h3{
+    font-family:'Work Sans',sans-serif;
+    font-size:16.5px;
+    font-weight:600;
+    margin:0 0 8px;
+    color:var(--ink);
+  }
+  .feature-card p{
+    font-size:13.5px;
+    line-height:1.6;
+    color:var(--ink-soft);
+    margin:0;
+  }
+
+  /* ---------- Closing band ---------- */
+  .closing{
+    background:var(--ink);
+    color:var(--paper);
+    border-radius:26px;
+    padding:56px 48px;
+    margin-bottom:70px;
+    text-align:center;
+  }
+  .closing-eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin:0 0 14px;
+  }
+  h2.closing-title{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-weight:400;
+    font-size:34px;
+    margin:0 0 28px;
+    color:var(--paper);
+  }
+  .closing .btn-primary{
+    background:var(--paper);
+    color:var(--ink);
+  }
+  .closing .btn-primary:hover{background:var(--rose); color:var(--ink);}
+
+  footer{
+    text-align:center;
+    padding:0 0 40px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    color:var(--ink-faint);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .preview-entry .cursor{animation:none;}
+  }
+
+  @media (max-width:860px){
+    .hero{grid-template-columns:1fr; padding:48px 0 60px;}
+    h1.hero-title{font-size:42px;}
+    .feature-grid{grid-template-columns:1fr;}
+    .closing{padding:44px 26px;}
+    .nav-links a.cta{padding:8px 13px;}
+  }
+  @media (max-width:480px){
+    .nav-links a:not(.cta){display:none;}
+  }
+
+  input:focus-visible, a:focus-visible, button:focus-visible{
+    outline:2px solid var(--rose);
+    outline-offset:2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="topnav">
+    <span class="brand">Daybook</span>
+    <nav class="nav-links">
+      <a href="/Login.html">Log in</a>
+      <a href="/Register.html" class="cta">Start your page</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div>
+      <p class="hero-eyebrow">One page, once a day</p>
+      <h1 class="hero-title">Keep a page for every day.</h1>
+      <p class="hero-sub">Write down how today went, clear what actually needs doing, and watch the bigger goals take shape — one page at a time.</p>
+      <div class="hero-ctas">
+        <a href="/Register.html" class="btn-primary">Start your page</a>
+        <a href="/Login.html" class="btn-secondary">Log in</a>
+      </div>
+    </div>
+
+    <div class="preview-shell">
+      <div class="preview-top">
+        <span class="preview-date" id="previewDate">TODAY</span>
+        <span class="preview-streak">🔥 <span id="streakCount">0</span> day streak</span>
+      </div>
+      <div class="mood-row-preview" id="moodRowPreview">
+        <div class="mood-dot-preview">☀</div>
+        <div class="mood-dot-preview">🙂</div>
+        <div class="mood-dot-preview">〜</div>
+        <div class="mood-dot-preview">🌧</div>
+        <div class="mood-dot-preview">⚡</div>
+      </div>
+      <div class="preview-entry" id="previewEntry"><span class="cursor"></span></div>
+      <ul class="preview-tasks">
+        <li class="ptask" id="task1"><span class="pbox"></span><span class="ptask-label">Reply to Sarah</span></li>
+        <li class="ptask" id="task2"><span class="pbox"></span><span class="ptask-label">Pay rent</span></li>
+        <li class="ptask done"><span class="pbox">✓</span><span class="ptask-label">Morning run</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="features-head">
+      <p class="features-eyebrow">What's on the page</p>
+      <h2 class="features-title">Three small habits, one place.</h2>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-glyph rose">☀</div>
+        <h3>Today's page</h3>
+        <p>A quick mood check-in and a few honest lines about how the day went. No prompts, no pressure — just today, in your own words.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-glyph sage">✓</div>
+        <h3>Tasks</h3>
+        <p>The handful of things you actually need to do today. Add them, check them off, and let the rest wait.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-glyph gold">◆</div>
+        <h3>Goals</h3>
+        <p>The bigger things, broken into milestones — so progress toward them is something you can actually see.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="closing">
+    <p class="closing-eyebrow">Tonight's page is empty</p>
+    <h2 class="closing-title">Fill it in.</h2>
+    <a href="/Register.html" class="btn-primary">Start your page</a>
+  </section>
+
+  <footer>Daybook — a page a day.</footer>
+</div>
+
+<script>
+(function(){
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const dateEl = document.getElementById('previewDate');
+  dateEl.textContent = new Date().toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' }).toUpperCase();
+
+  const moodDots = document.querySelectorAll('.mood-dot-preview');
+  const entryEl = document.getElementById('previewEntry');
+  const streakEl = document.getElementById('streakCount');
+  const task1 = document.getElementById('task1');
+  const task2 = document.getElementById('task2');
+
+  const sentence = "Shipped the thing I'd been putting off. Small win, felt good.";
+
+  function selectMood(i){
+    moodDots.forEach((d, idx) => d.classList.toggle('on', idx === i));
+  }
+
+  function typeText(text, el, done){
+    let i = 0;
+    const cursor = '<span class="cursor"></span>';
+    const tick = () => {
+      el.innerHTML = text.slice(0, i) + cursor;
+      i++;
+      if(i <= text.length){
+        setTimeout(tick, 26);
+      } else if(done){
+        done();
+      }
+    };
+    tick();
+  }
+
+  function countUp(el, to, duration){
+    const start = performance.now();
+    function frame(now){
+      const p = Math.min(1, (now - start) / duration);
+      el.textContent = Math.round(p * to);
+      if(p < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  if(reduced){
+    selectMood(1);
+    entryEl.textContent = sentence;
+    streakEl.textContent = '12';
+    task1.classList.add('done');
+    task2.classList.add('done');
+    return;
+  }
+
+  setTimeout(() => selectMood(1), 500);
+  setTimeout(() => {
+    typeText(sentence, entryEl, () => {
+      setTimeout(() => task1.classList.add('done'), 500);
+      setTimeout(() => task2.classList.add('done'), 1300);
+    });
+  }, 900);
+  setTimeout(() => countUp(streakEl, 12, 900), 1400);
+})();
+</script>
+
+</body>
+</html>
