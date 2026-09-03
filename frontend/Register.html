@@ -303,7 +303,7 @@
       }
 
       showBanner('success', 'Account created. Taking you to log in…');
-      setTimeout(() => { window.location.href = '/'; }, 1100);
+      setTimeout(() => { window.location.href = '/Login.html'; }, 1100);
     }catch(err){
       showBanner('error', `Couldn't create your account — ${err.message}`);
       submitBtn.disabled = false;
